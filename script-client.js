@@ -13,6 +13,18 @@ const i18n = {
         manualTargetLabel: "Translate to:",
         autoOption: "Auto-detect"
     },
+    hi: {
+        placeholder: "एक शब्द या वाक्यांश टाइप करें...",
+        button: "अनुवाद करें",
+        help: "टिप: सर्वोत्तम परिणामों के लिए छोटे वाक्यांशों का उपयोग करें",
+        errorServer: "अनुवाद सर्वर से कनेक्ट नहीं कर सकता। सुनिश्चित करें कि यह चल रहा है।",
+        detectedPrefix: "पहचाना गया:",
+        translatingTo: "अनुवादित कर रहा है:",
+        manualMode: "मैन्युअल मोड",
+        manualSourceLabel: "मैं बोलता हूँ:",
+        manualTargetLabel: "अनुवाद करें:",
+        autoOption: "स्वचालित पहचान"
+    },
     es: {
         placeholder: "Escriba una palabra o frase...",
         button: "Traducir",
