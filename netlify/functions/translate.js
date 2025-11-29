@@ -241,10 +241,11 @@ exports.handler = async function(event) {
             sourceCode = detected;
             console.log('Detected source language:', sourceCode);
             // Auto-map detected source to a sensible target if user didn't supply one
-            // Requirements: spanish -> english; french/hindi/mandarin/vietnamese -> spanish
+            // Hindi site: if detected source is Hindi -> translate to English
+            // Otherwise translate to Hindi (site main target)
             if (!userTarget) {
-              if (sourceCode === 'es') targetCode = 'en';
-              else if (['fr', 'hi', 'zh', 'vi'].includes(sourceCode)) targetCode = 'es';
+              if (sourceCode === 'hi') targetCode = 'en';
+              else targetCode = 'hi';
             }
             detectedSource = sourceCode;
             usedTarget = targetCode;
