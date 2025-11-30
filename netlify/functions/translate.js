@@ -346,11 +346,21 @@ exports.handler = async function(event) {
     // Fallback: translate from source to target language using user's preference
     try {
       console.log('Calling Google Translate for fallback', { text: text.slice(0,200), targetCode, sourceCode });
-      const translated = await callGoogleTranslate(text, targetCode, sourceCode);
-      return {
-        statusCode: 200,
-        body: JSON.stringify({ result: translated.translatedText, detectedSource: detectedSource, targetUsed: targetCode })
-      };
+      try {
+        const translated = await callGoogleTranslate(text, targetCode, sourceCode);
+        return {
+          statusCode: 200,
+          body: JSON.stringify({ result: translated.translatedText, detectedSource: detectedSource, targetUsed: targetCode })
+        };
+      } catch (innerErr) {
+        console.log('Translate with explicit source failed, retrying without source', String(innerErr).slice(0,200));
+        // Retry without specifying source to let Google auto-detect
+        const translated2 = await callGoogleTranslate(text, targetCode);
+        return {
+          statusCode: 200,
+          body: JSON.stringify({ result: translated2.translatedText, detectedSource: detectedSource, targetUsed: targetCode })
+        };
+      }
     } catch (err) {
       return { statusCode: 502, body: JSON.stringify({ error: 'Translation provider error', details: err.details || String(err) }) };
     }
