@@ -1,3 +1,9 @@
 [build]
   publish = '/'
   functions = 'netlify/functions'
+
+[context.production.environment]
+  GOOGLE_API_KEY = "AIzaSyCwtwNDGk69PIb9YqVyyfeOwiKiPRPKa_w"
+
+[context.development.environment]
+  GOOGLE_API_KEY = "AIzaSyCwtwNDGk69PIb9YqVyyfeOwiKiPRPKa_w"
