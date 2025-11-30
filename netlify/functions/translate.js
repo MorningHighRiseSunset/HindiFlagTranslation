@@ -76,6 +76,9 @@ const fallbackMap = {
   en: 'en', es: 'es', fr: 'fr', hi: 'hi', zh: 'zh', vi: 'vi', pt: 'pt', de: 'de', it: 'it', ar: 'ar', ja: 'ja', ko: 'ko', ru: 'ru'
 };
 
+// Treat Sanskrit (Google detect code 'sa') as Hindi for our purposes
+fallbackMap['sa'] = 'hi';
+
 function mapLanguageNameToCode(name) {
   if (!name) return null;
   const n = String(name).trim().toLowerCase();
@@ -246,8 +249,9 @@ exports.handler = async function(event) {
         try {
           const detected = await callGoogleDetect(text);
           if (detected) {
-            sourceCode = detected;
-            console.log('Detected source language:', sourceCode);
+            // Normalize: treat 'sa' (Sanskrit) as Hindi for better UX
+            sourceCode = (detected === 'sa') ? 'hi' : detected;
+            console.log('Detected source language:', detected, '=> resolved as', sourceCode);
             // Auto-map detected source to a sensible target if user didn't supply one
             // Hindi site: if detected source is Hindi -> translate to English
             // Otherwise translate to Hindi (site main target)
