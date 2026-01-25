@@ -195,8 +195,6 @@ function typeOutputAnimated(el, text) {
             span.classList.add('pop-in');
         }, index * 28);
     });
-    // Speak the result text after animation
-    speakText(text);
 }
 
 function speakText(text) {
@@ -284,9 +282,11 @@ async function startTranslate() {
         const manualTarget = document.getElementById('manualTarget');
 
         const payload = { text };
+        let isHindi = false;
         if (manualToggle && manualToggle.checked) {
             if (manualSource && manualSource.value) payload.source = manualSource.value;
             if (manualTarget && manualTarget.value) payload.target = manualTarget.value;
+            if (manualTarget && manualTarget.value === 'hindi') isHindi = true;
         }
 
         const response = await fetch('/.netlify/functions/translate', {
@@ -303,6 +303,18 @@ async function startTranslate() {
         } else {
             const result = data.result || '';
             typeOutputAnimated(output, result);
+
+            // Check if target is Hindi for speaker button
+            if (!isHindi && data.targetUsed === 'hi') isHindi = true;
+
+            if (isHindi) {
+                setTimeout(() => {
+                    const button = document.createElement('button');
+                    button.textContent = 'बोलो';
+                    button.onclick = () => speakText(result);
+                    output.appendChild(button);
+                }, result.length * 28 + 100);
+            }
 
             // Update detection/target display
             if (detectLabel) {
