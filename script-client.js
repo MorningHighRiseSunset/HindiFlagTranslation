@@ -225,13 +225,21 @@ function speakText(text) {
         targetLang = langMap[targetValue] || 'es';
     }
     
-        
+    // Get available voices
+    const voices = window.speechSynthesis.getVoices();
+    
     // iOS/Safari TTS fallback: if target is Mandarin and native voice likely unavailable,
     // convert to pinyin and speak using en-US voice to pronounce the romanization
     if (targetLang === 'zh') {
         const pinyinText = mandarinToPinyinStr(text);
         utterance.text = pinyinText;
         utterance.lang = 'en-US';
+    } else if (targetLang === 'hi') {
+        const hindiVoice = voices.find(v => v.lang.startsWith('hi'));
+        if (hindiVoice) {
+            utterance.voice = hindiVoice;
+        }
+        utterance.lang = 'hi';
     } else {
         utterance.lang = targetLang;
     }
@@ -309,11 +317,13 @@ async function startTranslate() {
 
             if (isHindi) {
                 setTimeout(() => {
+                    const br = document.createElement('br');
+                    output.appendChild(br);
                     const button = document.createElement('button');
                     button.textContent = 'बोलो';
                     button.onclick = () => speakText(result);
                     output.appendChild(button);
-                }, result.length * 28 + 100);
+                }, result.length * 28 + 200);
             }
 
             // Update detection/target display
