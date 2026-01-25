@@ -206,43 +206,13 @@ function speakText(text) {
     
     const utterance = new SpeechSynthesisUtterance(text);
     
-    // Try to detect target language for appropriate voice
-    const manualToggle = document.getElementById('manualToggle');
-    const manualTarget = document.getElementById('manualTarget');
-    let targetLang = 'en'; // default to English
-    
-    if (manualToggle && manualToggle.checked && manualTarget) {
-        const targetValue = manualTarget.value;
-        // Map manual keys to language codes
-        const langMap = {
-            'english': 'en',
-            'spanish': 'es',
-            'french': 'fr',
-            'hindi': 'hi',
-            'mandarin': 'zh',
-            'vietnamese': 'vi'
-        };
-        targetLang = langMap[targetValue] || 'es';
-    }
-    
-    // Get available voices
+    // For Hindi TTS (since button only appears for Hindi translations)
     const voices = window.speechSynthesis.getVoices();
-    
-    // iOS/Safari TTS fallback: if target is Mandarin and native voice likely unavailable,
-    // convert to pinyin and speak using en-US voice to pronounce the romanization
-    if (targetLang === 'zh') {
-        const pinyinText = mandarinToPinyinStr(text);
-        utterance.text = pinyinText;
-        utterance.lang = 'en-US';
-    } else if (targetLang === 'hi') {
-        const hindiVoice = voices.find(v => v.lang.startsWith('hi'));
-        if (hindiVoice) {
-            utterance.voice = hindiVoice;
-        }
-        utterance.lang = 'hi';
-    } else {
-        utterance.lang = targetLang;
+    const hindiVoice = voices.find(v => v.lang.startsWith('hi'));
+    if (hindiVoice) {
+        utterance.voice = hindiVoice;
     }
+    utterance.lang = 'hi';
     utterance.rate = 0.9; // Slightly slower for clarity
     
     window.speechSynthesis.speak(utterance);
@@ -317,12 +287,11 @@ async function startTranslate() {
 
             if (isHindi) {
                 setTimeout(() => {
-                    const br = document.createElement('br');
-                    output.appendChild(br);
                     const button = document.createElement('button');
                     button.textContent = 'बोलो';
                     button.onclick = () => speakText(result);
-                    output.appendChild(button);
+                    const container = output.parentNode;
+                    container.appendChild(button);
                 }, result.length * 28 + 200);
             }
 
