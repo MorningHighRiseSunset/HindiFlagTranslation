@@ -1,23 +1,23 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Spanish Flag Translation</title>
+    <title>Hindi Flag Translation</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <header class="site-header">
             <div class="header-top">
-                <h1>Spanish Translation Assistant (Asistente de Traducción al Español)</h1>
+                <h1>Hindi Translation Assistant (हिंदी अनुवाद सहायक)</h1>
             </div>
-            <p class="tag">Fast, friendly translations with playful text animations (Traducciones rápidas y amigables con animaciones de texto)</p>
+            <p class="tag">Fast, friendly translations with playful text animations (तेज़ और मित्रवत अनुवाद पाठ एनिमेशन के साथ)</p>
         </header>
 
         <form id="translateForm" class="controls" action="#" onsubmit="return false;">
-            <label for="input" class="visually-hidden">Text to translate (Texto a traducir)</label>
-            <input type="text" id="input" inputmode="text" autocomplete="off" placeholder="Type a word or phrase... (Escriba una palabra o frase...)">
+            <label for="input" class="visually-hidden">Text to translate (अनुवाद के लिए पाठ)</label>
+            <input type="text" id="input" inputmode="text" autocomplete="off" placeholder="Type a word or phrase... (एक शब्द या वाक्यांश टाइप करें...)">
         </form>
 
         <div id="detectBar" class="detect-bar" aria-live="polite">
@@ -28,23 +28,23 @@
         </div>
 
         <div id="manualControls" class="manual-controls" aria-hidden="true">
-            <label for="manualSource" class="manual-label">I speak / Hablo:</label>
+            <label for="manualSource" class="manual-label">I speak / मैं बोलता हूँ:</label>
             <select id="manualSource" class="manual-select">
                 <option value="">Auto-detect</option>
                 <option value="english">English</option>
+                <option value="hindi">Hindi (हिंदी)</option>
                 <option value="spanish">Spanish (Español)</option>
                 <option value="french">French (Français)</option>
-                <option value="hindi">Hindi (हिंदी)</option>
                 <option value="mandarin">Mandarin (中文)</option>
                 <option value="vietnamese">Vietnamese (Tiếng Việt)</option>
             </select>
 
-            <label for="manualTarget" class="manual-label">Translate to / Traducir a:</label>
+            <label for="manualTarget" class="manual-label">Translate to / अनुवाद करें:</label>
             <select id="manualTarget" class="manual-select">
-                <option value="spanish">Spanish (Español)</option>
-                <option value="english">English</option>
-                <option value="french">French (Français)</option>
                 <option value="hindi">Hindi (हिंदी)</option>
+                <option value="english">English</option>
+                <option value="spanish">Spanish (Español)</option>
+                <option value="french">French (Français)</option>
                 <option value="mandarin">Mandarin (中文)</option>
                 <option value="vietnamese">Vietnamese (Tiếng Việt)</option>
             </select>
@@ -52,7 +52,7 @@
 
         <div id="output" class="output" role="status" aria-live="polite"></div>
 
-        <small class="help">Tip: use short phrases for best results. Tap the button or press Enter. (Consejo: use frases cortas para mejores resultados. Pulse el botón o presione Enter.)</small>
+        <small class="help">Tip: use short phrases for best results. Tap the button or press Enter. (सुझाव: बेहतर परिणामों के लिए छोटे वाक्यांशों का उपयोग करें। बटन दबाएं या Enter दबाएं।)</small>
     </div>
         <!-- Modal and dropdowns removed: auto-detecting language as you type -->
     <script src="script-client.js"></script>

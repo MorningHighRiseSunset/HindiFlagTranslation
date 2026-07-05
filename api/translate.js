@@ -1,29 +1,27 @@
-// Netlify function: enhanced translator with intent parsing and quoted-phrase handling
-// This file was migrated from the local server implementation so behavior is consistent
+// Vercel serverless function: enhanced translator with intent parsing and quoted-phrase handling
+// This file was migrated from Netlify to Vercel
 
-const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
-// Safe debug: log presence of the API key (masked) so we can tell if Netlify injected it
+const DEEPL_API_KEY = process.env.DEEPL_API_KEY;
+// Safe debug: log presence of the API key (masked) so we can tell if Vercel injected it
 try {
-  if (GOOGLE_API_KEY) {
-    const masked = `${GOOGLE_API_KEY.slice(0, 6)}...${GOOGLE_API_KEY.slice(-4)}`;
-    console.log('GOOGLE_API_KEY present:', true, 'masked:', masked);
+  if (DEEPL_API_KEY) {
+    const masked = `${DEEPL_API_KEY.slice(0, 6)}...${DEEPL_API_KEY.slice(-4)}`;
+    console.log('DEEPL_API_KEY present:', true, 'masked:', masked);
   } else {
-    console.log('GOOGLE_API_KEY present:', false);
+    console.log('DEEPL_API_KEY present:', false);
   }
 } catch (e) {
   // Defensive: don't let logging errors break the function
-  console.log('Error while logging GOOGLE_API_KEY presence', String(e));
+  console.log('Error while logging DEEPL_API_KEY presence', String(e));
 }
 const path = require('path');
 
 // Load language aliases shipped with the site (falls back gracefully)
 let languageAliases = {};
 try {
-  // try a few likely locations for the shipped language_aliases.json depending on where this file lives
-  // 1) when this file is in netlify/functions -> ../../language_aliases.json
-  // 2) when this file is in project root -> ./language_aliases.json
+  // try a few likely locations for the shipped language_aliases.json
   try {
-    languageAliases = require(path.join(__dirname, '..', '..', 'language_aliases.json'));
+    languageAliases = require(path.join(__dirname, '..', 'language_aliases.json'));
   } catch (e1) {
     try {
       languageAliases = require(path.join(__dirname, 'language_aliases.json'));
@@ -36,19 +34,19 @@ try {
 }
 
 const canonicalToCode = {
-  english: 'en',
-  spanish: 'es',
-  french: 'fr',
-  hindi: 'hi',
-  mandarin: 'zh',
-  vietnamese: 'vi',
-  portuguese: 'pt',
-  german: 'de',
-  italian: 'it',
-  arabic: 'ar',
-  japanese: 'ja',
-  korean: 'ko',
-  russian: 'ru'
+  english: 'EN',
+  spanish: 'ES',
+  french: 'FR',
+  hindi: 'HI',
+  mandarin: 'ZH',
+  vietnamese: 'VI',
+  portuguese: 'PT-PT',
+  german: 'DE',
+  italian: 'IT',
+  arabic: 'AR',
+  japanese: 'JA',
+  korean: 'KO',
+  russian: 'RU'
 };
 
 const aliasToCode = {};
@@ -68,7 +66,7 @@ Object.keys(canonicalToCode).forEach((canonical) => {
 });
 
 const fallbackMap = {
-  en: 'en', es: 'es', fr: 'fr', hi: 'hi', zh: 'zh', vi: 'vi', pt: 'pt', de: 'de', it: 'it', ar: 'ar', ja: 'ja', ko: 'ko', ru: 'ru'
+  en: 'EN', es: 'ES', fr: 'FR', hi: 'HI', zh: 'ZH', vi: 'VI', pt: 'PT-PT', de: 'DE', it: 'IT', ar: 'AR', ja: 'JA', ko: 'KO', ru: 'RU'
 };
 
 function mapLanguageNameToCode(name) {
@@ -80,7 +78,7 @@ function mapLanguageNameToCode(name) {
   const cleaned = n.replace(/[^a-z]/g, '');
   if (aliasToCode[cleaned]) return aliasToCode[cleaned];
   if (fallbackMap[cleaned]) return fallbackMap[cleaned];
-  if (/^[a-z]{2}$/.test(cleaned)) return cleaned;
+  if (/^[a-z]{2}$/.test(cleaned)) return cleaned.toUpperCase();
   return null;
 }
 
@@ -99,23 +97,23 @@ function resolveLanguageName(name) {
     cleaned = cleaned.replace(/[^a-z\s]/g, '');
   }
 
-  // Common Spanish names -> ISO codes
+  // Common Spanish names -> DeepL language codes
   const spanishNameMap = {
-    ingles: 'en', ingleses: 'en', inglese: 'en',
-    espanol: 'es', espanola: 'es', espanoles: 'es', espanol: 'es', espanol_: 'es',
-    frances: 'fr', franceses: 'fr',
-    aleman: 'de', alemanes: 'de',
-    italiano: 'it', italianos: 'it',
-    portugues: 'pt', portuguesas: 'pt', portugues: 'pt',
-    japones: 'ja', japoneses: 'ja',
-    japonesa: 'ja',
-    chino: 'zh', china: 'zh', chinos: 'zh',
-    mandarin: 'zh', mandarines: 'zh',
-    ruso: 'ru', rusos: 'ru',
-    arabe: 'ar', arabes: 'ar',
-    coreano: 'ko', coreanos: 'ko',
-    vietnamita: 'vi', vietnamitas: 'vi',
-    hindi: 'hi', hindues: 'hi'
+    ingles: 'EN', ingleses: 'EN', inglese: 'EN',
+    espanol: 'ES', espanola: 'ES', espanoles: 'ES', espanol: 'ES', espanol_: 'ES',
+    frances: 'FR', franceses: 'FR',
+    aleman: 'DE', alemanes: 'DE',
+    italiano: 'IT', italianos: 'IT',
+    portugues: 'PT-PT', portuguesas: 'PT-PT', portugues: 'PT-PT',
+    japones: 'JA', japoneses: 'JA',
+    japonesa: 'JA',
+    chino: 'ZH', china: 'ZH', chinos: 'ZH',
+    mandarin: 'ZH', mandarines: 'ZH',
+    ruso: 'RU', rusos: 'RU',
+    arabe: 'AR', arabes: 'AR',
+    coreano: 'KO', coreanos: 'KO',
+    vietnamita: 'VI', vietnamitas: 'VI',
+    hindi: 'HI', hindues: 'HI'
   };
 
   if (spanishNameMap[cleaned]) return spanishNameMap[cleaned];
@@ -127,57 +125,34 @@ function resolveLanguageName(name) {
   return null;
 }
 
-async function callGoogleDetect(q) {
-  const url = `https://translation.googleapis.com/language/translate/v2/detect?key=${GOOGLE_API_KEY}`;
-  const payload = { q: String(q) };
+async function callDeepLTranslate(q, target, source) {
+  // Use DeepL Free API endpoint
+  const url = 'https://api-free.deepl.com/v2/translate';
+  const payload = { 
+    text: [String(q)], 
+    target_lang: target 
+  };
+  if (source) payload.source_lang = source;
+
   const apiRes = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': `DeepL-Auth-Key ${DEEPL_API_KEY}`
+    },
     body: JSON.stringify(payload)
   });
+
   if (!apiRes.ok) {
-    // Log Google Detect response for debugging (do not log API key)
+    // Log DeepL response for debugging
     let textErr = '';
     try {
       textErr = await apiRes.text();
     } catch (e) {
       textErr = String(e);
     }
-    console.log('Google Detect failed', { status: apiRes.status, body: textErr.slice(0,2000) });
-    const err = new Error('Google detect error');
-    err.status = apiRes.status;
-    err.details = textErr;
-    throw err;
-  }
-  const json = await apiRes.json();
-  if (json && json.data && json.data.detections && json.data.detections[0] && json.data.detections[0][0]) {
-    return json.data.detections[0][0].language;
-  }
-  throw new Error('Invalid response from Google Detect');
-}
-
-async function callGoogleTranslate(q, target, source) {
-  const url = `https://translation.googleapis.com/language/translate/v2?key=${GOOGLE_API_KEY}`;
-  const payload = { q: String(q), target: target, format: 'text' };
-  if (source) payload.source = source;
-
-
-  const apiRes = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
-
-  if (!apiRes.ok) {
-    // Log Google Translate response for debugging (trim large bodies)
-    let textErr = '';
-    try {
-      textErr = await apiRes.text();
-    } catch (e) {
-      textErr = String(e);
-    }
-    console.log('Google Translate failed', { status: apiRes.status, body: textErr.slice(0,2000) });
-    const err = new Error('Google API error');
+    console.log('DeepL Translate failed', { status: apiRes.status, body: textErr.slice(0,2000) });
+    const err = new Error('DeepL API error');
     err.status = apiRes.status;
     err.details = textErr;
     throw err;
@@ -185,23 +160,33 @@ async function callGoogleTranslate(q, target, source) {
 
   const json = await apiRes.json();
 
-  if (json && json.data && json.data.translations && json.data.translations[0]) {
-    return json.data.translations[0];
+  if (json && json.translations && json.translations[0]) {
+    return { 
+      translatedText: json.translations[0].text,
+      detectedSourceLanguage: json.translations[0].detected_source_language
+    };
   }
-  const err = new Error('Invalid response from Google Translate');
+  const err = new Error('Invalid response from DeepL');
   err.raw = json;
   throw err;
 }
 
-exports.handler = async function(event) {
+
+export default async function handler(req, res) {
   console.log('translate handler invoked');
+  // Only allow POST requests
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+  
   try {
-    console.log('Incoming event body (raw):', typeof event.body === 'string' ? event.body.slice(0,1000) : event.body);
-    if (!GOOGLE_API_KEY) return { statusCode: 500, body: JSON.stringify({ error: 'Server: API key not configured' }) };
-    const body = JSON.parse(event.body || '{}');
+    console.log('Incoming event body (raw):', typeof req.body === 'string' ? req.body.slice(0,1000) : req.body);
+    if (!DEEPL_API_KEY) return res.status(500).json({ error: 'Server: API key not configured' });
+    
+    const body = req.body;
     console.log('Parsed request body:', { text: body.text ? '[REDACTED]' : undefined, source: body.source, target: body.target });
     const { text, source: userSource, target: userTarget } = body || {};
-    if (!text) return { statusCode: 400, body: JSON.stringify({ error: 'Missing `text` in request body' }) };
+    if (!text) return res.status(400).json({ error: 'Missing `text` in request body' });
 
     // Map user language names (from dropdown) to codes (be resilient if mapping fails)
     let sourceCode = null;
@@ -209,7 +194,7 @@ exports.handler = async function(event) {
       sourceCode = mapLanguageNameToCode(userSource);
       if (!sourceCode) console.log('Could not map source language:', userSource);
     }
-    let targetCode = 'es'; // default to Spanish (client will set explicit language pair)
+    let targetCode = 'HI'; // default to Hindi (client will set explicit language pair)
      if (userTarget) {
        const mapped = mapLanguageNameToCode(userTarget);
        if (mapped) {
@@ -225,33 +210,12 @@ exports.handler = async function(event) {
   let detectedSource = sourceCode || null;
   let usedTarget = targetCode || null;
     try {
-      // If we don't know the source language, try to detect it using Google Detect
-      if (!sourceCode) {
-        try {
-          const detected = await callGoogleDetect(text);
-          if (detected) {
-            sourceCode = detected;
-            console.log('Detected source language:', sourceCode);
-            // Auto-map detected source to a sensible target if user didn't supply one
-            // Requirements: spanish -> english; french/hindi/mandarin/vietnamese -> spanish
-            if (!userTarget) {
-              if (sourceCode === 'es') targetCode = 'en';
-              else if (['fr', 'hi', 'zh', 'vi'].includes(sourceCode)) targetCode = 'es';
-            }
-            detectedSource = sourceCode;
-            usedTarget = targetCode;
-          }
-        } catch (e) {
-          console.log('Language detection failed, continuing without it', String(e));
-        }
-      }
+      // DeepL auto-detects source language when not specified
+      // We'll get the detected language from the translation response
 
-      if (sourceCode && sourceCode !== 'en') {
-        const t = await callGoogleTranslate(text, 'en', sourceCode);
-        englishText = t.translatedText || String(text);
-      } else {
-        englishText = String(text);
-      }
+      // Skip English translation for intent parsing with DeepL
+      // DeepL handles multiple languages directly
+      englishText = String(text);
     } catch (err) {
       englishText = String(text);
     }
@@ -283,7 +247,7 @@ exports.handler = async function(event) {
     }
 
     if (match) {
-      const phraseToTranslate = (match[1] || '').trim().replace(/["'«»“”‹›]/g, '');
+      const phraseToTranslate = (match[1] || '').trim().replace(/["'«»""‹›]/g, '');
       // If the pattern didn't capture a second group (some patterns may omit it), try heuristics
       const maybeLang = (match[2] || '').trim();
       let extractedTargetCode = null;
@@ -295,7 +259,7 @@ exports.handler = async function(event) {
       if (!extractedTargetCode) {
         // If the question explicitly mentions "en inglés" or similar, map 'inglés' -> 'en'
         if (/ingles|inglesa|inglés|inglés/i.test(maybeLang || '') || /en\s*ingl(es|és)/i.test(englishText)) {
-          extractedTargetCode = 'en';
+          extractedTargetCode = 'EN';
         } else if (userTarget) {
           const mapped = mapLanguageNameToCode(userTarget);
           if (mapped) extractedTargetCode = mapped;
@@ -304,16 +268,13 @@ exports.handler = async function(event) {
 
       if (extractedTargetCode) {
         try {
-          // Only call Google Translate if we have a valid source code to translate FROM
-          // If sourceCode is not available or null, fall through to fallback
-          if (sourceCode && sourceCode !== extractedTargetCode) {
-            const translated = await callGoogleTranslate(phraseToTranslate || text, extractedTargetCode, sourceCode);
-            // Return only the translated phrase as the direct answer and include detected/source info
-            return {
-              statusCode: 200,
-              body: JSON.stringify({ result: translated.translatedText, detectedSource: detectedSource, targetUsed: extractedTargetCode })
-            };
+          // Call DeepL Translate
+          const translated = await callDeepLTranslate(phraseToTranslate || text, extractedTargetCode, sourceCode);
+          // Update detected source from DeepL response
+          if (translated.detectedSourceLanguage) {
+            detectedSource = translated.detectedSourceLanguage.toLowerCase();
           }
+          return res.status(200).json({ result: translated.translatedText, detectedSource: detectedSource, targetUsed: extractedTargetCode });
         } catch (err) {
           console.log('Pattern-matched translation failed, falling back to full-text translation', { error: String(err).slice(0, 200) });
           // Fall through to fallback translation on error instead of returning 502
@@ -324,19 +285,20 @@ exports.handler = async function(event) {
 
     // Fallback: translate from source to target language using user's preference
     try {
-      console.log('Calling Google Translate for fallback', { text: text.slice(0,200), targetCode, sourceCode });
-      const translated = await callGoogleTranslate(text, targetCode, sourceCode);
-      return {
-        statusCode: 200,
-        body: JSON.stringify({ result: translated.translatedText, detectedSource: detectedSource, targetUsed: targetCode })
-      };
+      console.log('Calling DeepL Translate for fallback', { text: text.slice(0,200), targetCode, sourceCode });
+      const translated = await callDeepLTranslate(text, targetCode, sourceCode);
+      // Update detected source from DeepL response
+      if (translated.detectedSourceLanguage) {
+        detectedSource = translated.detectedSourceLanguage.toLowerCase();
+      }
+      return res.status(200).json({ result: translated.translatedText, detectedSource: detectedSource, targetUsed: targetCode });
     } catch (err) {
-      return { statusCode: 502, body: JSON.stringify({ error: 'Translation provider error', details: err.details || String(err) }) };
+      return res.status(502).json({ error: 'Translation provider error', details: err.details || String(err) });
     }
 
   } catch (err) {
     console.error('Unhandled error in translate handler:', err);
     const errorDetails = err && err.stack ? err.stack : String(err);
-    return { statusCode: 500, body: JSON.stringify({ error: 'Server error', details: errorDetails }) };
+    return res.status(500).json({ error: 'Server error', details: errorDetails });
   }
 };

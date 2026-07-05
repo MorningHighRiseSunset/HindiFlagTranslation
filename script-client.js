@@ -13,17 +13,17 @@ const i18n = {
         manualTargetLabel: "Translate to:",
         autoOption: "Auto-detect"
     },
-    es: {
-        placeholder: "Escriba una palabra o frase...",
-        button: "Traducir",
-        help: "Use frases cortas para mejores resultados",
-        errorServer: "No se puede acceder al servidor de traducción. Asegúrate de que esté en ejecución.",
-        detectedPrefix: "Detectado:",
-        translatingTo: "Traduciendo a:",
-        manualMode: "Modo manual",
-        manualSourceLabel: "Hablo:",
-        manualTargetLabel: "Traducir a:",
-        autoOption: "Detección automática"
+    hi: {
+        placeholder: "एक शब्द या वाक्यांश टाइप करें...",
+        button: "अनुवाद करें",
+        help: "बेहतर परिणामों के लिए छोटे वाक्यांशों का उपयोग करें",
+        errorServer: "अनुवाद सर्वर तक नहीं पहुँचा जा सकता। सुनिश्चित करें कि यह चल रहा है।",
+        detectedPrefix: "पता चला:",
+        translatingTo: "अनुवाद करना:",
+        manualMode: "मैनुअल मोड",
+        manualSourceLabel: "मैं बोलता हूँ:",
+        manualTargetLabel: "अनुवाद करें:",
+        autoOption: "स्वचालित पहचान"
     }
 };
 
@@ -32,13 +32,13 @@ const codeToFriendly = { en: 'English', es: 'Spanish', fr: 'French', hi: 'Hindi'
 
 // Manual options (values map to server mapping expectations)
 const manualOptions = [
-    { key: '', label_en: i18n.en.autoOption, label_es: i18n.es.autoOption },
-    { key: 'english', label_en: 'English', label_es: 'Inglés' },
-    { key: 'spanish', label_en: 'Spanish (Español)', label_es: 'Español' },
-    { key: 'french', label_en: 'French (Français)', label_es: 'Francés' },
-    { key: 'hindi', label_en: 'Hindi (हिंदी)', label_es: 'Hindi' },
-    { key: 'mandarin', label_en: 'Mandarin (中文)', label_es: 'Mandarín' },
-    { key: 'vietnamese', label_en: 'Vietnamese (Tiếng Việt)', label_es: 'Vietnamita' }
+    { key: '', label_en: i18n.en.autoOption, label_hi: i18n.hi.autoOption },
+    { key: 'english', label_en: 'English', label_hi: 'अंग्रेज़ी' },
+    { key: 'hindi', label_en: 'Hindi (हिंदी)', label_hi: 'हिंदी' },
+    { key: 'spanish', label_en: 'Spanish (Español)', label_hi: 'स्पैनिश' },
+    { key: 'french', label_en: 'French (Français)', label_hi: 'फ्रेंच' },
+    { key: 'mandarin', label_en: 'Mandarin (中文)', label_hi: 'मैंडरिन' },
+    { key: 'vietnamese', label_en: 'Vietnamese (Tiếng Việt)', label_hi: 'वियतनामी' }
 ];
 
 let detectTimer = null;
@@ -95,12 +95,12 @@ function populateManualSelects() {
     manualOptions.forEach(opt => {
         const o1 = document.createElement('option');
         o1.value = opt.key;
-        o1.textContent = locale === i18n.es ? (opt.label_es || opt.label_en) : (opt.label_en || opt.label_es);
+        o1.textContent = locale === i18n.hi ? (opt.label_hi || opt.label_en) : (opt.label_en || opt.label_hi);
         src.appendChild(o1);
 
         const o2 = document.createElement('option');
-        o2.value = opt.key === '' ? 'spanish' : opt.key; // default target options should include spanish first
-        o2.textContent = locale === i18n.es ? (opt.label_es || opt.label_en) : (opt.label_en || opt.label_es);
+        o2.value = opt.key === '' ? 'hindi' : opt.key; // default target options should include hindi first
+        o2.textContent = locale === i18n.hi ? (opt.label_hi || opt.label_en) : (opt.label_en || opt.label_hi);
         tgt.appendChild(o2);
     });
 }
@@ -126,7 +126,7 @@ async function startTranslate() {
             if (manualTarget && manualTarget.value) payload.target = manualTarget.value;
         }
 
-        const response = await fetch('/.netlify/functions/translate', {
+        const response = await fetch('/api/translate', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -172,7 +172,7 @@ function friendlyNameFromManualKey(key) {
     const m = manualOptions.find(o => o.key === key);
     if (!m) return key;
     const locale = localizeUI();
-    return locale === i18n.es ? (m.label_es || m.label_en) : (m.label_en || m.label_es);
+    return locale === i18n.hi ? (m.label_hi || m.label_en) : (m.label_en || m.label_hi);
 }
 
 function localeString(k) {
