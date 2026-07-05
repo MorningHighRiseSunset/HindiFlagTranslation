@@ -41,6 +41,62 @@ const manualOptions = [
     { key: 'vietnamese', label_en: 'Vietnamese (Tiếng Việt)', label_hi: 'वियतनामी' }
 ];
 
+// English alphabet A-Z
+const englishAlphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+
+// Hindi alphabet data: Hindi symbol, English transliteration
+const hindiAlphabet = [
+    { hindi: 'अ', transliteration: 'A' },
+    { hindi: 'आ', transliteration: 'Aa' },
+    { hindi: 'इ', transliteration: 'I' },
+    { hindi: 'ई', transliteration: 'Ii' },
+    { hindi: 'उ', transliteration: 'U' },
+    { hindi: 'ऊ', transliteration: 'Uu' },
+    { hindi: 'ऋ', transliteration: 'R' },
+    { hindi: 'ए', transliteration: 'E' },
+    { hindi: 'ऐ', transliteration: 'Ai' },
+    { hindi: 'ओ', transliteration: 'O' },
+    { hindi: 'औ', transliteration: 'Au' },
+    { hindi: 'अं', transliteration: 'Am' },
+    { hindi: 'अः', transliteration: 'Ah' },
+    { hindi: 'क', transliteration: 'Ka' },
+    { hindi: 'ख', transliteration: 'Kha' },
+    { hindi: 'ग', transliteration: 'Ga' },
+    { hindi: 'घ', transliteration: 'Gha' },
+    { hindi: 'ङ', transliteration: 'Nga' },
+    { hindi: 'च', transliteration: 'Cha' },
+    { hindi: 'छ', transliteration: 'Chha' },
+    { hindi: 'ज', transliteration: 'Ja' },
+    { hindi: 'झ', transliteration: 'Jha' },
+    { hindi: 'ञ', transliteration: 'Nya' },
+    { hindi: 'ट', transliteration: 'Ta' },
+    { hindi: 'ठ', transliteration: 'Tha' },
+    { hindi: 'ड', transliteration: 'Da' },
+    { hindi: 'ढ', transliteration: 'Dha' },
+    { hindi: 'ण', transliteration: 'Na' },
+    { hindi: 'त', transliteration: 'Ta' },
+    { hindi: 'थ', transliteration: 'Tha' },
+    { hindi: 'द', transliteration: 'Da' },
+    { hindi: 'ध', transliteration: 'Dha' },
+    { hindi: 'न', transliteration: 'Na' },
+    { hindi: 'प', transliteration: 'Pa' },
+    { hindi: 'फ', transliteration: 'Pha' },
+    { hindi: 'ब', transliteration: 'Ba' },
+    { hindi: 'भ', transliteration: 'Bha' },
+    { hindi: 'म', transliteration: 'Ma' },
+    { hindi: 'य', transliteration: 'Ya' },
+    { hindi: 'र', transliteration: 'Ra' },
+    { hindi: 'ल', transliteration: 'La' },
+    { hindi: 'व', transliteration: 'Va' },
+    { hindi: 'श', transliteration: 'Sha' },
+    { hindi: 'ष', transliteration: 'Sha' },
+    { hindi: 'स', transliteration: 'Sa' },
+    { hindi: 'ह', transliteration: 'Ha' },
+    { hindi: 'क्ष', transliteration: 'Ksha' },
+    { hindi: 'त्र', transliteration: 'Tra' },
+    { hindi: 'ज्ञ', transliteration: 'Gya' }
+];
+
 let detectTimer = null;
 const DEBOUNCE_MS = 1500; // Increased from 600ms to avoid interrupting the user mid-word
 
@@ -79,6 +135,59 @@ function typeOutputAnimated(el, text) {
     });
 }
 
+function isAlphabetRequest(text) {
+    const lowerText = text.toLowerCase().trim();
+    const alphabetPatterns = [
+        /alphabet/,
+        /show me alphabet/,
+        /hindi alphabet/,
+        /learn alphabet/,
+        /alphabet chart/,
+        /letters/,
+        /akshar/,
+        /varnamala/
+    ];
+    return alphabetPatterns.some(pattern => pattern.test(lowerText));
+}
+
+function displayAlphabet(el) {
+    el.innerHTML = '';
+    el.className = 'output alphabet-display';
+    
+    const table = document.createElement('div');
+    table.className = 'alphabet-table';
+    
+    // Header row
+    const header = document.createElement('div');
+    header.className = 'alphabet-row alphabet-header';
+    header.innerHTML = `
+        <div class="alphabet-cell">English</div>
+        <div class="alphabet-cell">Hindi Symbol</div>
+        <div class="alphabet-cell">Hindi (English)</div>
+    `;
+    table.appendChild(header);
+    
+    // Data rows - match English A-Z with Hindi symbols and transliteration
+    const maxRows = Math.max(englishAlphabet.length, hindiAlphabet.length);
+    for (let i = 0; i < maxRows; i++) {
+        const row = document.createElement('div');
+        row.className = 'alphabet-row';
+        
+        const englishLetter = englishAlphabet[i] || '';
+        const hindiLetter = hindiAlphabet[i] ? hindiAlphabet[i].hindi : '';
+        const hindiTransliteration = hindiAlphabet[i] ? hindiAlphabet[i].transliteration : '';
+        
+        row.innerHTML = `
+            <div class="alphabet-cell english-letter">${englishLetter}</div>
+            <div class="alphabet-cell hindi-symbol">${hindiLetter}</div>
+            <div class="alphabet-cell hindi-transliteration">${hindiTransliteration}</div>
+        `;
+        table.appendChild(row);
+    }
+    
+    el.appendChild(table);
+}
+
 function localizeUI() {
     // Use page language to choose locale (default to en)
     const pageLang = (document.documentElement.lang || 'en').slice(0,2).toLowerCase();
@@ -112,6 +221,17 @@ async function startTranslate() {
     if (!input || !output) return;
     const text = input.value.trim();
     if (!text) return;
+
+    // Check if user is asking for alphabet
+    if (isAlphabetRequest(text)) {
+        setBusy(true);
+        displayAlphabet(output);
+        if (detectLabel) {
+            detectLabel.textContent = 'Hindi Alphabet (हिंदी वर्णमाला)';
+        }
+        setBusy(false);
+        return;
+    }
 
     setBusy(true);
     try {

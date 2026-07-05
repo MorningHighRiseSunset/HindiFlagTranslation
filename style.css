@@ -335,3 +335,100 @@ button[disabled]{opacity:0.6;cursor:default;transform:none}
         max-width: 100%;
     }
 }
+
+/* Alphabet Display Styles */
+.alphabet-display {
+    padding: 0 !important;
+    background: white !important;
+    border: 1px solid #e1e6ee !important;
+    overflow-x: auto;
+}
+
+.alphabet-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.alphabet-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px;
+    border-bottom: 1px solid #e1e6ee;
+}
+
+.alphabet-row:last-child {
+    border-bottom: none;
+}
+
+.alphabet-header {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    color: white;
+    font-weight: 700;
+    position: sticky;
+    top: 0;
+}
+
+.alphabet-header .alphabet-cell {
+    padding: 12px 8px;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.alphabet-cell {
+    padding: 10px 8px;
+    text-align: center;
+    font-size: 0.95rem;
+    background: #fafbfc;
+    color: #333;
+}
+
+.alphabet-cell:nth-child(2) {
+    background: #f0f4f8;
+}
+
+.alphabet-cell:nth-child(3) {
+    background: #fafbfc;
+}
+
+.english-letter {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.hindi-symbol {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.hindi-transliteration {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #444;
+}
+
+.alphabet-row:hover .alphabet-cell {
+    background: #e6f0ff;
+}
+
+/* Responsive alphabet table */
+@media (max-width: 640px) {
+    .alphabet-cell {
+        padding: 8px 4px;
+        font-size: 0.85rem;
+    }
+    
+    .alphabet-header .alphabet-cell {
+        padding: 10px 4px;
+        font-size: 0.8rem;
+    }
+    
+    .hindi-symbol {
+        font-size: 1.2rem;
+    }
+    
+    .hindi-letter {
+        font-size: 1rem;
+    }
+}
