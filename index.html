@@ -7,6 +7,73 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+        <!-- SLT UI Start -->
+        <div class="container slt-ui">
+            <h1>
+                Hindi Verb Learning Tool<br>
+                <span class="subtitle">(हिंदी क्रिया सीखने का उपकरण)</span>
+            </h1>
+            <div id="modeSelect">
+                <button id="practiceModeBtn">
+                    Practice<br>
+                    <span class="btn-sub">(अभ्यास)</span>
+                </button>
+                <button id="quizModeBtn">
+                    Quiz<br>
+                    <span class="btn-sub">(प्रश्नोत्तरी)</span>
+                </button>
+            </div>
+            <div id="practiceSection" style="display:none;">
+                <h2>
+                    Practice
+                </h2>
+                <div class="practice-forms">
+                    <div class="practice-card">
+                        <form id="practiceFormEn">
+                            <div class="input-col">
+                                <input type="text" id="practiceInputEn" placeholder="Type an English verb" required>
+                                <span class="input-hint">(अंग्रेजी क्रिया टाइप करें)</span>
+                            </div>
+                            <input type="text" id="practiceInputEnHindi" readonly tabindex="-1" class="output-input" />
+                            <button type="submit">
+                                Show Hindi<br>
+                                <span class="btn-sub">(हिंदी दिखाएं)</span>
+                            </button>
+                        </form>
+                    </div>
+                    <div class="practice-card">
+                        <form id="practiceFormHi">
+                            <div class="input-col">
+                                <input type="text" id="practiceInputHi" placeholder="हिंदी क्रिया टाइप करें" required>
+                                <span class="input-hint">(Type a verb in Hindi)</span>
+                            </div>
+                            <input type="text" id="practiceInputHiEnglish" readonly tabindex="-1" class="output-input" />
+                            <button type="submit">
+                                Show English<br>
+                                <span class="btn-sub">(अंग्रेजी दिखाएं)</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <div id="practiceResults"></div>
+            </div>
+            <div id="quizSection" style="display:none;">
+                <h2>
+                    Quiz<br>
+                    <span class="subtitle">(प्रश्नोत्तरी)</span>
+                </h2>
+                <div id="quizPrompt"></div>
+                <form id="quizForm">
+                    <input type="text" id="quizInput" placeholder="Type the English translation" required>
+                    <button type="submit">
+                        Submit<br>
+                        <span class="btn-sub">(जमा करें)</span>
+                    </button>
+                </form>
+                <div id="quizFeedback"></div>
+            </div>
+        </div>
+        <!-- SLT UI End -->
     <div class="container">
         <header class="site-header">
             <div class="header-top">
@@ -56,5 +123,6 @@
     </div>
         <!-- Modal and dropdowns removed: auto-detecting language as you type -->
     <script src="script-client.js"></script>
+    <script type="module" src="hindi_script.js"></script>
 </body>
 </html>
